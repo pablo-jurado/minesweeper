@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 
-let AppState = {
+let appState = {
   board: null,
   rowIndx: 10,
   colIndx: 10,
@@ -10,13 +10,13 @@ let AppState = {
   isGameOver: false
 }
 
-AppState.board = createEmptyBoard()
+appState.board = createEmptyBoard()
 
 function createEmptyBoard () {
   let board = []
-  for (let i = 0; i < AppState.rowIndx; i++) {
+  for (let i = 0; i < appState.rowIndx; i++) {
     let col = []
-    for (let j = 0; j < AppState.colIndx; j++) {
+    for (let j = 0; j < appState.colIndx; j++) {
       col.push({ isClicked: false, mine: false, flag: false })
     }
     board.push(col)
@@ -29,19 +29,18 @@ function getRandom (min, max) {
 }
 
 function reset () {
-  AppState.board = createEmptyBoard()
-  for (let i = 0; i < AppState.minesNum; i++) {
-    AppState.board[getRandom(0, AppState.rowIndx)][getRandom(0, AppState.colIndx)].mine = true
+  appState.board = createEmptyBoard()
+  for (let i = 0; i < appState.minesNum; i++) {
+    appState.board[getRandom(0, appState.rowIndx)][getRandom(0, appState.colIndx)].mine = true
   }
-  AppState.isGameOver = false
-  render()
+  appState.isGameOver = false
 }
 
 reset()
 
 function App (state) {
   let resetButton = <div onClick={reset} className='emoji'>&#9786;</div>
-  if (AppState.isGameOver) {
+  if (appState.isGameOver) {
     resetButton = <div onClick={reset} className='emoji'>&#9785;</div>
   }
   return (
@@ -67,17 +66,17 @@ function checkAround (xStr, yStr) {
   const y2 = y + 1
   let values = []
 
-  if (x0 >= 0 && y0 >= 0) values.push(AppState.board[x0][y0].mine)
-  if (x0 >= 0) values.push(AppState.board[x0][y].mine)
-  if (x0 >= 0 && y2 < AppState.rowIndx) values.push(AppState.board[x0][y2].mine)
+  if (x0 >= 0 && y0 >= 0) values.push(appState.board[x0][y0].mine)
+  if (x0 >= 0) values.push(appState.board[x0][y].mine)
+  if (x0 >= 0 && y2 < appState.rowIndx) values.push(appState.board[x0][y2].mine)
 
-  if (y0 >= 0) values.push(AppState.board[x][y0].mine)
-  // let val5 = values.push(AppState.board[x][y].mine)
-  if (y2 < AppState.rowIndx) values.push(AppState.board[x][y2].mine)
+  if (y0 >= 0) values.push(appState.board[x][y0].mine)
+  // let val5 = values.push(appState.board[x][y].mine)
+  if (y2 < appState.rowIndx) values.push(appState.board[x][y2].mine)
 
-  if (x2 < AppState.colIndx && y0 >= 0) values.push(AppState.board[x2][y0].mine)
-  if (x2 < AppState.colIndx) values.push(AppState.board[x2][y].mine)
-  if (x2 < AppState.colIndx && y2 < AppState.rowIndx) values.push(AppState.board[x2][y2].mine)
+  if (x2 < appState.colIndx && y0 >= 0) values.push(appState.board[x2][y0].mine)
+  if (x2 < appState.colIndx) values.push(appState.board[x2][y].mine)
+  if (x2 < appState.colIndx && y2 < appState.rowIndx) values.push(appState.board[x2][y2].mine)
 
   const mines = values.filter((item) => {
     return (item)
@@ -87,22 +86,20 @@ function checkAround (xStr, yStr) {
 }
 
 function handleClick (e) {
-  if (!AppState.isGameOver) {
+  if (!appState.isGameOver) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
-    AppState.board[x][y].isClicked = true
+    appState.board[x][y].isClicked = true
   }
-  render()
 }
 
 function rightClick (e) {
   e.preventDefault()
-  if (!AppState.isGameOver) {
+  if (!appState.isGameOver) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
-    AppState.board[x][y].flag = !AppState.board[x][y].flag
+    appState.board[x][y].flag = !appState.board[x][y].flag
   }
-  render()
 }
 
 function Squares (squares, rowIndex) {
@@ -113,7 +110,7 @@ function Squares (squares, rowIndex) {
     if (square.isClicked) {
       if (square.mine) {
         classVal = 'square mine'
-        AppState.isGameOver = true
+        appState.isGameOver = true
       }
       if (!square.mine) {
         classVal = 'square off'
@@ -140,10 +137,15 @@ function Row (board) {
   return rowCollection
 }
 
-function render () {
-  ReactDOM.render(
-    App(AppState),
-    document.getElementById('root')
-  )
+// ---------------------------------------------------------
+// Render Loop
+// ---------------------------------------------------------
+
+const rootEl = document.getElementById('root')
+
+function renderNow () {
+  ReactDOM.render(App(appState), rootEl)
+  window.requestAnimationFrame(renderNow)
 }
-render()
+
+window.requestAnimationFrame(renderNow)
