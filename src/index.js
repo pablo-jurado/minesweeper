@@ -38,25 +38,6 @@ function reset () {
 
 reset()
 
-function App (state) {
-  let resetButton = <div onClick={reset} className='emoji'>&#9786;</div>
-  if (appState.isGameOver) {
-    resetButton = <div onClick={reset} className='emoji'>&#9785;</div>
-  }
-  return (
-    <div className='app'>
-      <div className='score'>
-        <div className='score1'>000</div>
-        {resetButton}
-        <div className='score2'>000</div>
-      </div>
-      <div className='board'>
-        {Row(state.board)}
-      </div>
-    </div>
-  )
-}
-
 function checkAround (xStr, yStr) {
   let x = parseInt(xStr)
   let y = parseInt(yStr)
@@ -135,6 +116,25 @@ function Row (board) {
     return <div key={i} className='row'>{Squares(item, i)}</div>
   })
   return rowCollection
+}
+
+function App (state) {
+  let resetButton = <div onClick={reset} className='emoji'>&#9786;</div>
+  if (appState.isGameOver) {
+    resetButton = <div onClick={reset} className='emoji'>&#9785;</div>
+  }
+  return (
+    <div className='app'>
+      <div className='score'>
+        <div className='score1'>000</div>
+        {resetButton}
+        <div className='score2'>000</div>
+      </div>
+      <div className='board'>
+        {Row(state.board)}
+      </div>
+    </div>
+  )
 }
 
 // ---------------------------------------------------------

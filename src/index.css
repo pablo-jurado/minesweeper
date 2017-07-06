@@ -69,12 +69,21 @@ body {
    border-color: grey;
 }
 
-.square.mine {
-   border-color: red;
+.square.mine:before {
+   color: red;
+   font-family: FontAwesome;
+   content: "\f1e2";
+   border-color: grey;
 }
 
-.square.flag {
-   border-color: blue;
+.square.mine {
+   border-color: grey;
+}
+
+.square.flag:before {
+  color: yellow;
+  font-family: FontAwesome;
+  content: "\f071";
 }
 
 .row {
