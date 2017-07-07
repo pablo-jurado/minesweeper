@@ -7,7 +7,8 @@ let appState = {
   rowIndx: 10,
   colIndx: 10,
   minesNum: 20,
-  isGameOver: false
+  isGameOver: false,
+  startGame: false
 }
 
 appState.board = createEmptyBoard()
@@ -30,13 +31,31 @@ function getRandom (min, max) {
 
 function reset () {
   appState.board = createEmptyBoard()
-  for (let i = 0; i < appState.minesNum; i++) {
-    appState.board[getRandom(0, appState.rowIndx)][getRandom(0, appState.colIndx)].mine = true
-  }
   appState.isGameOver = false
+  appState.startGame = false
 }
 
 reset()
+
+function randomXY () {
+  xRan = getRandom(0, appState.rowIndx)
+  yRan = getRandom(0, appState.colIndx)
+}
+
+let xRan = 0
+let yRan = 0
+
+function startGame (x, y) {
+  appState.startGame = true
+  for (var i = 0; i < appState.minesNum; i++) {
+    randomXY()
+    if ((parseInt(x, 10) === xRan && parseInt(y, 10) === yRan) || (appState.board[xRan][yRan].mine === true)) {
+      i--
+    } else {
+      appState.board[xRan][yRan].mine = true
+    }
+  }
+}
 
 function checkAround (xStr, yStr) {
   let x = parseInt(xStr, 10)
@@ -79,11 +98,12 @@ function showEmptySquares (x, y, x0, x2, y0, y2) {
   if (x2 < appState.colIndx && y2 < appState.rowIndx) appState.board[x2][y2].isClicked = true
 }
 
-function handleClick (e) {
+function leftClick (e) {
   if (!appState.isGameOver) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
     appState.board[x][y].isClicked = true
+    if (!appState.startGame) startGame(x, y)
   }
 }
 
@@ -127,7 +147,7 @@ function Squares (squares, rowIndex) {
     return (
       <div
         onContextMenu={rightClick}
-        onClick={handleClick}
+        onClick={leftClick}
         data-row={rowIndex}
         data-col={i} key={i}
         className={classVal}>{minesNumber}
@@ -150,14 +170,16 @@ function App (state) {
     resetButton = <div onClick={reset} className='emoji'>&#9785;</div>
   }
   return (
-    <div className='app'>
-      <div className='score'>
-        <div className='score1'>000</div>
-        {resetButton}
-        <div className='score2'>000</div>
-      </div>
-      <div className='board'>
-        {Row(state.board)}
+    <div>
+      <div className='app'>
+        <div className='score'>
+          <div className='score1'>000</div>
+          {resetButton}
+          <div className='score2'>000</div>
+        </div>
+        <div className='board'>
+          {Row(state.board)}
+        </div>
       </div>
     </div>
   )
