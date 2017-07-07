@@ -17,7 +17,7 @@ function createEmptyBoard () {
   for (let i = 0; i < appState.rowIndx; i++) {
     let col = []
     for (let j = 0; j < appState.colIndx; j++) {
-      col.push({ isClicked: false, mine: false, flag: false })
+      col.push({ isClicked: false, mine: false, flag: false, showMine: false })
     }
     board.push(col)
   }
@@ -96,15 +96,28 @@ function rightClick (e) {
   }
 }
 
+function showAllMines () {
+  let flattened = appState.board.reduce(
+    (acc, cur) => acc.concat(cur),
+    []
+  )
+
+  flattened.forEach(function (square) {
+    if (square.mine) square.showMine = true
+  })
+}
+
 function Squares (squares, rowIndex) {
   let squaresCollection = squares.map((square, i) => {
     let classVal = 'square'
     let minesNumber = null
     if (square.flag) classVal = 'square flag'
+    if (square.showMine) classVal = 'square mine-off'
     if (square.isClicked) {
       if (square.mine) {
         classVal = 'square mine'
         appState.isGameOver = true
+        showAllMines()
       }
       if (!square.mine) {
         classVal = 'square off'

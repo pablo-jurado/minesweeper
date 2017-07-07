@@ -88,6 +88,13 @@ body {
    background: red;
 }
 
+.square.mine-off:before {
+   color: black;
+   font-family: FontAwesome;
+   content: "\f1e2";
+   border-color: grey;
+}
+
 .square.flag:before {
   color: #3b3b3b;
   font-family: FontAwesome;
