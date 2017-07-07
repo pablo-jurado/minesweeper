@@ -52,7 +52,6 @@ function checkAround (xStr, yStr) {
   if (x0 >= 0 && y2 < appState.rowIndx) values.push(appState.board[x0][y2].mine)
 
   if (y0 >= 0) values.push(appState.board[x][y0].mine)
-  // let val5 = values.push(appState.board[x][y].mine)
   if (y2 < appState.rowIndx) values.push(appState.board[x][y2].mine)
 
   if (x2 < appState.colIndx && y0 >= 0) values.push(appState.board[x2][y0].mine)
@@ -64,6 +63,20 @@ function checkAround (xStr, yStr) {
   })
   const minesNum = mines.length
   if (minesNum) return minesNum
+  showEmptySquares(xStr, yStr, x0, x2, y0, y2)
+}
+
+function showEmptySquares (x, y, x0, x2, y0, y2) {
+  if (x0 >= 0 && y0 >= 0) appState.board[x0][y0].isClicked = true
+  if (x0 >= 0) appState.board[x0][y].isClicked = true
+  if (x0 >= 0 && y2 < appState.rowIndx) appState.board[x0][y2].isClicked = true
+
+  if (y0 >= 0) appState.board[x][y0].isClicked = true
+  if (y2 < appState.rowIndx) appState.board[x][y2].isClicked = true
+
+  if (x2 < appState.colIndx && y0 >= 0) appState.board[x2][y0].isClicked = true
+  if (x2 < appState.colIndx) appState.board[x2][y].isClicked = true
+  if (x2 < appState.colIndx && y2 < appState.rowIndx) appState.board[x2][y2].isClicked = true
 }
 
 function handleClick (e) {
