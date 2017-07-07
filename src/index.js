@@ -155,6 +155,7 @@ function Squares (squares, rowIndex) {
         appState.isGameOver = true
         clearTimeout(timer)
         showAllMines()
+        // TODO: show flag that were wrong
       }
       if (!square.mine) {
         classVal = 'square off'
@@ -203,6 +204,14 @@ function Row (board) {
   return rowCollection
 }
 
+function EditBoard () {
+  return (
+    <div>
+      todo: create edit board inputs
+    </div>
+  )
+}
+
 function App (state) {
   return (
     <div>
@@ -212,6 +221,7 @@ function App (state) {
           {Row(state.board)}
         </div>
       </div>
+      {EditBoard()}
     </div>
   )
 }
