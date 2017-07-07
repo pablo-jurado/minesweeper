@@ -2,16 +2,34 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 
+// -----------------------------------------------------------------------------
+// APP STATE
+// -----------------------------------------------------------------------------
+
 let appState = {
   board: null,
   rowIndx: 10,
   colIndx: 10,
   minesNum: 10,
+  flagNum: 10,
   isGameOver: false,
-  startGame: false
+  startGame: false,
+  seconds: 0
 }
 
 appState.board = createEmptyBoard()
+
+// -----------------------------------------------------------------------------
+// GLOBAL VARIABLES
+// -----------------------------------------------------------------------------
+
+let xRan = 0
+let yRan = 0
+let timer = null
+
+// -----------------------------------------------------------------------------
+// COMPONENTS
+// -----------------------------------------------------------------------------
 
 function createEmptyBoard () {
   let board = []
@@ -33,20 +51,17 @@ function reset () {
   appState.board = createEmptyBoard()
   appState.isGameOver = false
   appState.startGame = false
+  appState.seconds = 0
 }
-
-reset()
 
 function randomXY () {
   xRan = getRandom(0, appState.rowIndx)
   yRan = getRandom(0, appState.colIndx)
 }
 
-let xRan = 0
-let yRan = 0
-
 function startGame (x, y) {
   appState.startGame = true
+  timer = setInterval(function () { appState.seconds++ }, 1000)
   for (var i = 0; i < appState.minesNum; i++) {
     randomXY()
     if ((parseInt(x, 10) === xRan && parseInt(y, 10) === yRan) || (appState.board[xRan][yRan].mine === true)) {
@@ -113,6 +128,7 @@ function rightClick (e) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
     appState.board[x][y].flag = !appState.board[x][y].flag
+    appState.flagNum--
   }
 }
 
@@ -137,6 +153,7 @@ function Squares (squares, rowIndex) {
       if (square.mine) {
         classVal = 'square mine'
         appState.isGameOver = true
+        clearTimeout(timer)
         showAllMines()
       }
       if (!square.mine) {
@@ -165,8 +182,8 @@ function addZero (number) {
 }
 
 function Score (state) {
-  let mines = addZero(state.minesNum)
-
+  let mines = addZero(state.flagNum)
+  let time = addZero(state.seconds)
   let resetButton = <span>&#9786;</span>
   if (state.isGameOver) resetButton = <span>&#9785;</span>
 
@@ -174,7 +191,7 @@ function Score (state) {
     <div className='score'>
       <div className='mines-number'>{mines}</div>
       <div onClick={reset} className='emoji'>{resetButton}</div>
-      <div className='timer'>000</div>
+      <div className='timer'>{time}</div>
     </div>
   )
 }
