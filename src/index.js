@@ -39,8 +39,8 @@ function reset () {
 reset()
 
 function checkAround (xStr, yStr) {
-  let x = parseInt(xStr)
-  let y = parseInt(yStr)
+  let x = parseInt(xStr, 10)
+  let y = parseInt(yStr, 10)
   const x0 = x - 1
   const x2 = x + 1
   const y0 = y - 1
@@ -63,7 +63,7 @@ function checkAround (xStr, yStr) {
     return (item)
   })
   const minesNum = mines.length
-  return minesNum
+  if (minesNum) return minesNum
 }
 
 function handleClick (e) {

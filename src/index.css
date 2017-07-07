@@ -70,18 +70,19 @@ body {
 }
 
 .square.mine:before {
-   color: red;
+   color: black;
    font-family: FontAwesome;
    content: "\f1e2";
    border-color: grey;
 }
 
 .square.mine {
-   border-color: grey;
+   border-color: red;
+   background: red;
 }
 
 .square.flag:before {
-  color: yellow;
+  color: #3b3b3b;
   font-family: FontAwesome;
   content: "\f071";
 }
