@@ -6,7 +6,7 @@ let appState = {
   board: null,
   rowIndx: 10,
   colIndx: 10,
-  minesNum: 20,
+  minesNum: 10,
   isGameOver: false,
   startGame: false
 }
@@ -157,6 +157,28 @@ function Squares (squares, rowIndex) {
   return squaresCollection
 }
 
+function addZero (number) {
+  let numLength = number.toString().length
+  if (numLength === 1) number = '00' + number
+  if (numLength === 2) number = '0' + number
+  return number
+}
+
+function Score (state) {
+  let mines = addZero(state.minesNum)
+
+  let resetButton = <span>&#9786;</span>
+  if (state.isGameOver) resetButton = <span>&#9785;</span>
+
+  return (
+    <div className='score'>
+      <div className='mines-number'>{mines}</div>
+      <div onClick={reset} className='emoji'>{resetButton}</div>
+      <div className='timer'>000</div>
+    </div>
+  )
+}
+
 function Row (board) {
   let rowCollection = board.map((item, i) => {
     return <div key={i} className='row'>{Squares(item, i)}</div>
@@ -165,18 +187,10 @@ function Row (board) {
 }
 
 function App (state) {
-  let resetButton = <div onClick={reset} className='emoji'>&#9786;</div>
-  if (appState.isGameOver) {
-    resetButton = <div onClick={reset} className='emoji'>&#9785;</div>
-  }
   return (
     <div>
       <div className='app'>
-        <div className='score'>
-          <div className='score1'>000</div>
-          {resetButton}
-          <div className='score2'>000</div>
-        </div>
+        {Score(state)}
         <div className='board'>
           {Row(state.board)}
         </div>

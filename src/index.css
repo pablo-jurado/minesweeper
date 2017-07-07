@@ -34,7 +34,7 @@ body {
   border: solid 1px black;
 }
 
-.score .score1, .score .score2 {
+.score .mines-number, .score .timer {
   font-family: 'Press Start 2P', cursive;
   font-size: 3em;
   line-height: 140%;
