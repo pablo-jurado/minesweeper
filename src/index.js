@@ -150,6 +150,7 @@ function Squares (squares, rowIndex) {
     if (square.flag) classVal = 'square flag'
     if (square.showMine) classVal = 'square mine-off'
     if (square.isClicked) {
+      // TODO: check for winner
       if (square.mine) {
         classVal = 'square mine'
         appState.isGameOver = true
@@ -206,22 +207,25 @@ function Row (board) {
 
 function EditBoard () {
   return (
-    <div>
-      todo: create edit board inputs
-    </div>
+    <form>
+      <input type='number' placeholder='Rows' />
+      <input type='number' placeholder='Columns' />
+      <input type='number' placeholder='Miness' />
+      <input type='submit' value='Create' />
+    </form>
   )
 }
 
 function App (state) {
   return (
     <div>
+      {EditBoard()}
       <div className='app'>
         {Score(state)}
         <div className='board'>
           {Row(state.board)}
         </div>
       </div>
-      {EditBoard()}
     </div>
   )
 }
