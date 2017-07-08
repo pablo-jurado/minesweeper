@@ -24,8 +24,8 @@ Built with:
 
 [Pablo Jurado](http://www.pablojurado.com)
 
-[Create React App]:(https://github.com/facebookincubator/create-react-app)
-[Surge]:(http://surge.sh/)
+[Create React App]:https://github.com/facebookincubator/create-react-app
+[Surge]:http://surge.sh/
 [Minesweeper]:https://en.wikipedia.org/wiki/Minesweeper_(video_game)
 [React]:https://facebook.github.io/react/
 [functional, stateless components]:https://facebook.github.io/react/docs/components-and-props.html#props-are-read-only
