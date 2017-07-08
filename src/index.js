@@ -48,6 +48,7 @@ function getRandom (min, max) {
 }
 
 function reset () {
+  clearTimeout(timer)
   appState.board = createEmptyBoard()
   appState.isGameOver = false
   appState.startGame = false
@@ -183,6 +184,10 @@ function addZero (number) {
   return number
 }
 
+function createNewBoard () {
+
+}
+
 function Score (state) {
   let mines = addZero(state.flagNum)
   let time = addZero(state.seconds)
@@ -207,10 +212,10 @@ function Row (board) {
 
 function EditBoard () {
   return (
-    <form>
+    <form onSubmit={createNewBoard}>
       <input type='number' placeholder='Rows' />
       <input type='number' placeholder='Columns' />
-      <input type='number' placeholder='Miness' />
+      <input type='number' placeholder='Mines' />
       <input type='submit' value='Create' />
     </form>
   )
@@ -230,9 +235,9 @@ function App (state) {
   )
 }
 
-// ---------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Render Loop
-// ---------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const rootEl = document.getElementById('root')
 
