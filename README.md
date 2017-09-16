@@ -1,12 +1,13 @@
 
 # Minesweeper
 
-This project was bootstrapped with [Create React App]
-and deploy with [Surge]
+This project is a functional React [Minesweeper], bootstrapped with [Create React App] and deploy with [Surge]
 
 <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="Standard - JavaScript Style Guide">
 
-> NOTE: This functional React [Minesweeper] is still in progress.
+> NOTE: work in progress.
+
+[Link](http://minesweeper-react.surge.sh/)
 
 <img src="img/screenshot.png" alt="React App Screen shot">
 
