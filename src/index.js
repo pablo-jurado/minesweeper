@@ -1,125 +1,80 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-
-// -----------------------------------------------------------------------------
-// APP STATE
-// -----------------------------------------------------------------------------
-
-let appState = {
-  board: null,
-  rowIndx: 10,
-  colIndx: 10,
-  minesNum: 10,
-  flagNum: 10,
-  isGameOver: false,
-  startGame: false,
-  seconds: 0
-}
-
-appState.board = createEmptyBoard()
-
-// -----------------------------------------------------------------------------
-// GLOBAL VARIABLES
-// -----------------------------------------------------------------------------
-
-let xRan = 0
-let yRan = 0
-let timer = null
+import { createStore } from 'redux'
 
 // -----------------------------------------------------------------------------
 // COMPONENTS
 // -----------------------------------------------------------------------------
 
-function createEmptyBoard () {
-  let board = []
-  for (let i = 0; i < appState.rowIndx; i++) {
-    let col = []
-    for (let j = 0; j < appState.colIndx; j++) {
-      col.push({ isClicked: false, mine: false, flag: false, showMine: false })
-    }
-    board.push(col)
-  }
-  return board
-}
-
 function getRandom (min, max) {
   return Math.floor(Math.random() * (max - min) + min)
 }
 
-function reset () {
-  clearTimeout(timer)
-  appState.board = createEmptyBoard()
-  appState.isGameOver = false
-  appState.startGame = false
-  appState.seconds = 0
-}
-
-function randomXY () {
-  xRan = getRandom(0, appState.rowIndx)
-  yRan = getRandom(0, appState.colIndx)
-}
-
-function startGame (x, y) {
-  appState.startGame = true
-  timer = setInterval(function () { appState.seconds++ }, 1000)
+function createMines (x, y) {
   for (var i = 0; i < appState.minesNum; i++) {
-    randomXY()
-    if ((parseInt(x, 10) === xRan && parseInt(y, 10) === yRan) || (appState.board[xRan][yRan].mine === true)) {
+    const xRan = getRandom(0, appState.rowIndx)
+    const yRan = getRandom(0, appState.colIndx)
+    if ((parseInt(x, 10) === xRan && parseInt(y, 10) === yRan) ||
+        (appState.board[xRan][yRan].mine === true)) {
+          console.log('count in', i)
       i--
     } else {
-      appState.board[xRan][yRan].mine = true
+      addMine(xRan, yRan)
     }
   }
 }
 
-function checkAround (xStr, yStr) {
-  let x = parseInt(xStr, 10)
-  let y = parseInt(yStr, 10)
-  const x0 = x - 1
-  const x2 = x + 1
-  const y0 = y - 1
-  const y2 = y + 1
+// this returns the number of mines around the square
+function getMineNumber (xStr, yStr) {
+  let xNum = parseInt(xStr, 10)
+  let yNum = parseInt(yStr, 10)
+
   let values = []
 
-  if (x0 >= 0 && y0 >= 0) values.push(appState.board[x0][y0].mine)
-  if (x0 >= 0) values.push(appState.board[x0][y].mine)
-  if (x0 >= 0 && y2 < appState.rowIndx) values.push(appState.board[x0][y2].mine)
-
-  if (y0 >= 0) values.push(appState.board[x][y0].mine)
-  if (y2 < appState.rowIndx) values.push(appState.board[x][y2].mine)
-
-  if (x2 < appState.colIndx && y0 >= 0) values.push(appState.board[x2][y0].mine)
-  if (x2 < appState.colIndx) values.push(appState.board[x2][y].mine)
-  if (x2 < appState.colIndx && y2 < appState.rowIndx) values.push(appState.board[x2][y2].mine)
+  for (var x = xNum - 1; x < xNum + 2; x++) {
+    for (var y = yNum - 1; y < yNum + 2; y++) {
+      if (x >= 0 && x < appState.colIndx && y >= 0 && y < appState.rowIndx) {
+        values.push(appState.board[x][y].mine)
+      }
+    }
+  }
 
   const mines = values.filter((item) => {
     return (item)
   })
+
   const minesNum = mines.length
+
   if (minesNum) return minesNum
-  showEmptySquares(xStr, yStr, x0, x2, y0, y2)
+  return undefined
 }
 
-function showEmptySquares (x, y, x0, x2, y0, y2) {
-  if (x0 >= 0 && y0 >= 0) appState.board[x0][y0].isClicked = true
-  if (x0 >= 0) appState.board[x0][y].isClicked = true
-  if (x0 >= 0 && y2 < appState.rowIndx) appState.board[x0][y2].isClicked = true
+function showEmptySquares (xStr, yStr) {
+  let xNum = parseInt(xStr, 10)
+  let yNum = parseInt(yStr, 10)
 
-  if (y0 >= 0) appState.board[x][y0].isClicked = true
-  if (y2 < appState.rowIndx) appState.board[x][y2].isClicked = true
-
-  if (x2 < appState.colIndx && y0 >= 0) appState.board[x2][y0].isClicked = true
-  if (x2 < appState.colIndx) appState.board[x2][y].isClicked = true
-  if (x2 < appState.colIndx && y2 < appState.rowIndx) appState.board[x2][y2].isClicked = true
+  for (var x = xNum - 1; x < xNum + 2; x++) {
+    for (var y = yNum - 1; y < yNum + 2; y++) {
+      if (x >= 0 && x < appState.colIndx && y >= 0 && y < appState.rowIndx) {
+        if (!appState.board[x][y].mine) handleLeftClick(x, y)
+      }
+    }
+  }
 }
 
 function leftClick (e) {
   if (!appState.isGameOver) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
-    appState.board[x][y].isClicked = true
-    if (!appState.startGame) startGame(x, y)
+
+    // frist click inits game
+    if (!appState.startGame) firstClick(x, y)
+
+    if (!appState.board[x][y].isClicked) {
+      handleLeftClick(x, y)
+      showEmptySquares(x, y)
+    }
   }
 }
 
@@ -128,8 +83,8 @@ function rightClick (e) {
   if (!appState.isGameOver) {
     let x = e.target.dataset.row
     let y = e.target.dataset.col
-    appState.board[x][y].flag = !appState.board[x][y].flag
-    appState.flagNum--
+
+    handleRightClick(x, y)
   }
 }
 
@@ -154,6 +109,7 @@ function Squares (squares, rowIndex) {
       // TODO: check for winner
       if (square.mine) {
         classVal = 'square mine'
+        // todo: redux
         appState.isGameOver = true
         clearTimeout(timer)
         showAllMines()
@@ -161,7 +117,7 @@ function Squares (squares, rowIndex) {
       }
       if (!square.mine) {
         classVal = 'square off'
-        minesNumber = checkAround(rowIndex, i)
+        minesNumber = getMineNumber(rowIndex, i)
       }
     }
     return (
@@ -182,10 +138,6 @@ function addZero (number) {
   if (numLength === 1) number = '00' + number
   if (numLength === 2) number = '0' + number
   return number
-}
-
-function createNewBoard () {
-
 }
 
 function Score (state) {
@@ -221,10 +173,14 @@ function EditBoard () {
   )
 }
 
+function createNewBoard () {
+  // TODO:
+}
+
 function App (state) {
   return (
     <div>
-      {EditBoard()}
+      { /* EditBoard() */ }
       <div className='app'>
         {Score(state)}
         <div className='board'>
@@ -236,14 +192,149 @@ function App (state) {
 }
 
 // -----------------------------------------------------------------------------
-// Render Loop
+// APP STATE
 // -----------------------------------------------------------------------------
 
-const rootEl = document.getElementById('root')
-
-function renderNow () {
-  ReactDOM.render(App(appState), rootEl)
-  window.requestAnimationFrame(renderNow)
+let appState = {
+  board: null,
+  rowIndx: 10,
+  colIndx: 10,
+  minesNum: 10,
+  flagNum: 10,
+  isGameOver: false,
+  startGame: false,
+  seconds: 0,
+  timer: null
 }
 
-window.requestAnimationFrame(renderNow)
+appState.board = createEmptyBoard()
+
+function createEmptyBoard () {
+  let board = []
+  for (let i = 0; i < appState.rowIndx; i++) {
+    let col = []
+    for (let j = 0; j < appState.colIndx; j++) {
+      col.push({ isClicked: false, mine: false, flag: false, showMine: false })
+    }
+    board.push(col)
+  }
+  return board
+}
+
+// -----------------------------------------------------------------------------
+// ACTIONS
+// -----------------------------------------------------------------------------
+function firstClick (x, y) {
+  store.dispatch({type: 'START_GAME', payload: true })
+  startTimer()
+  createMines(x, y)
+}
+
+var timer = null
+function startTimer () {
+  timer = setInterval(updateTimer, 1000)
+  // store.dispatch({type: 'START_TIMER', payload: timer })
+}
+
+function updateTimer () {
+  store.dispatch({type: 'UPDATE_TIMER', payload: 1 })
+}
+
+function handleLeftClick (x, y) {
+  store.dispatch({type: 'LEFT_CLICK', payload: {'x': x, 'y': y} })
+}
+
+function handleRightClick (x, y) {
+  console.log('RIGHT_CLICK', x, y)
+  store.dispatch({type: 'RIGHT_CLICK', payload: {'x': x, 'y': y} })
+}
+
+function addMine (x, y) {
+  store.dispatch({type: 'ADD_MINE', payload: {'x': x, 'y': y} })
+}
+
+function reset () {
+  let newBoard = createEmptyBoard()
+  clearInterval(timer)
+  const newState = {
+    board: newBoard,
+    isGameOver: false,
+    startGame: false,
+    seconds: 0,
+    flagNum: 10
+  }
+  store.dispatch({type: 'RESET', payload: newState })
+}
+
+// -------------------------------------------------
+// REDUX
+// -------------------------------------------------
+
+// create the store and set initial state
+let store = createStore(reducer, appState)
+
+// TODO: state need to be immmutable
+function reducer (state, action) {
+  if (action.type === 'START_GAME') {
+    const x = action.payload.x
+    const y = action.payload.y
+
+    state.startGame = action.payload
+  }
+
+  if (action.type === 'UPDATE_TIMER') {
+    state.seconds += action.payload
+  }
+
+  if (action.type === 'LEFT_CLICK') {
+    const x = action.payload.x
+    const y = action.payload.y
+    state.board[x][y].isClicked = true
+  }
+
+  if (action.type === 'RIGHT_CLICK') {
+    const x = action.payload.x
+    const y = action.payload.y
+
+    if (state.board[x][y].flag) {
+      state.board[x][y].flag = false
+      state.flagNum++
+    } else {
+      state.board[x][y].flag = true
+      state.flagNum--
+    }
+  }
+
+  if (action.type === 'ADD_MINE') {
+    const x = action.payload.x
+    const y = action.payload.y
+    state.board[x][y].mine = true
+  }
+
+  if (action.type === 'RESET') {
+    state.board = action.payload.board
+    state.isGameOver = action.payload.isGameOver
+    state.startGame = action.payload.startGame
+    state.seconds = action.payload.seconds
+    state.flagNum = action.payload.flagNum
+  }
+
+  return state
+}
+
+// connects the redux store to the react render function
+store.subscribe(render)
+
+// -----------------------------------------------------------------------------
+// Render
+// -----------------------------------------------------------------------------
+
+function render () {
+  ReactDOM.render(
+    App(store.getState()),
+    document.getElementById('root')
+  )
+}
+
+// init app
+render()
